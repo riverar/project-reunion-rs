@@ -1,0 +1,9 @@
+[package]
+name = "example-skeleton"
+version = "0.0.0"
+edition = "2018"
+
+[dependencies]
+windows = "0.11.0"
+bindings = { package = "examples-skeleton-bindings", path = "bindings" }
+project-reunion-rs = { path = "../../" }

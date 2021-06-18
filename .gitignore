@@ -1,0 +1,9 @@
+# Ignore compilation artifacts
+**/target
+
+# Ignore staging temporary space
+tmp/
+
+# Ignore staged files
+**/.windows/lib
+**/.windows/winmd
