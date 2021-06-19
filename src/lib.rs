@@ -1,4 +1,4 @@
-// We implement PackageVersion ourselves to avoid creating a WinRT dependency.
+mod tests;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
