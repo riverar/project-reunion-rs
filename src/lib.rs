@@ -3,15 +3,15 @@
 #[repr(C)]
 #[derive(Clone, Copy)]
 struct PackageVersion {
-    major: u8,
-    minor: u8,
-    build: u8,
     revision: u8,
+    build: u8,
+    minor: u8,
+    major: u8,
 }
 
-impl From<PackageVersion> for u32 {
-    fn from(src: PackageVersion) -> u32 {
-        ((src.major as u32) << 8) | src.minor as u32
+impl PackageVersion {
+    fn to_major_minor(&self) -> u32 {
+        ((self.major as u32) << 8) | self.minor as u32
     }
 }
 
@@ -41,7 +41,7 @@ pub fn initialize() -> windows::Result<()> {
     let version_tag: Vec<u16> = "preview".encode_utf16().collect();
     unsafe {
         MddBootstrapInitialize(
-            package_version.into(),
+            package_version.to_major_minor(),
             version_tag.as_ptr(),
             package_version,
         )
