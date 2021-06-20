@@ -1,10 +1,13 @@
 use bindings::{
     Microsoft::UI::Xaml::*,
     Windows::Win32::{
-        Foundation::{BOOL, HWND},
+        Foundation::{BOOL, HWND, RECT},
         UI::{
             HiDpi::GetDpiForWindow,
-            WindowsAndMessaging::{SetWindowPos, SWP_NOMOVE},
+            WindowsAndMessaging::{
+                GetSystemMetrics, GetWindowRect, SetWindowPos, SM_CXSCREEN, SM_CYSCREEN,
+                SWP_NOMOVE, SWP_NOSIZE,
+            },
         },
     },
 };
@@ -58,23 +61,53 @@ unsafe impl ::windows::Interface for IWindowNative {
     );
 }
 
-pub fn resize_window(window: &Window, width: u32, height: u32) -> BOOL {
+pub fn resize_window(window: &Window, width: u32, height: u32) -> bool {
     let native_window = window.cast::<IWindowNative>().unwrap();
-    if let Some(handle) = native_window.handle() {
-        let scale_factor = unsafe { GetDpiForWindow(handle) / 96 };
-        let width = width * scale_factor;
-        let height = height * scale_factor;
-        unsafe {
-            return SetWindowPos(
-                handle,
-                HWND(0),
-                0, // x
-                0, // y
-                width as i32,
-                height as i32,
-                SWP_NOMOVE,
-            );
+    let handle = match native_window.handle() {
+        Some(it) => it,
+        _ => return false,
+    };
+
+    let scale_factor = unsafe { GetDpiForWindow(handle) } / 96;
+    let width = width * scale_factor;
+    let height = height * scale_factor;
+    unsafe {
+        return bool::from(SetWindowPos(
+            handle,
+            HWND(0),
+            0, // x
+            0, // y
+            width as i32,
+            height as i32,
+            SWP_NOMOVE,
+        ));
+    }
+}
+
+pub fn center_window(window: &Window) -> bool {
+    let native_window = window.cast::<IWindowNative>().unwrap();
+    let handle = match native_window.handle() {
+        Some(it) => it,
+        _ => return false,
+    };
+    unsafe {
+        let mut rect: RECT = RECT::default();
+        match GetWindowRect(handle, &mut rect as *mut RECT) {
+            BOOL(1) => {
+                let screen_width = GetSystemMetrics(SM_CXSCREEN);
+                let screen_height = GetSystemMetrics(SM_CYSCREEN);
+
+                bool::from(SetWindowPos(
+                    handle,
+                    HWND(0),
+                    (screen_width / 2) - (rect.right - rect.left) / 2,
+                    (screen_height / 2) - (rect.bottom - rect.top) / 2,
+                    0, // cx
+                    0, // cy
+                    SWP_NOSIZE,
+                ))
+            }
+            _ => false,
         }
     }
-    BOOL::from(false)
 }

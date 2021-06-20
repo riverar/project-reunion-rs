@@ -2,7 +2,7 @@
 
 use std::convert::TryFrom;
 
-use project_reunion_rs::{workarounds::resize_window, PackageVersion};
+use project_reunion_rs::{PackageVersion, workarounds};
 
 use bindings::{
     Microsoft,
@@ -39,7 +39,8 @@ impl App {
             }));
 
             window.SetContent(&button);
-            resize_window(window, 500, 500);
+            workarounds::resize_window(window, 500, 500);
+            workarounds::center_window(window);
             window.Activate()
         } else {
             Err(HRESULT::from_thread().into())
