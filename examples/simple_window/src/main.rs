@@ -2,7 +2,7 @@
 
 use std::convert::TryFrom;
 
-use project_reunion_rs::workarounds::resize_window;
+use project_reunion_rs::{workarounds::resize_window, PackageVersion};
 
 use bindings::{
     Microsoft,
@@ -48,13 +48,11 @@ impl App {
 }
 
 fn main() -> windows::Result<()> {
-    match project_reunion_rs::initialize() {
-        Ok(_) => {
-            Application::Start(ApplicationInitializationCallback::new(|_| {
-                App { window: None }.new()?;
-                Ok(())
-            }))
-        }
-        Err(err) => { Err(err) }
+    match project_reunion_rs::initialize(PackageVersion::new(0, 8, 0, 0)) {
+        Ok(_) => Application::Start(ApplicationInitializationCallback::new(|_| {
+            App { window: None }.new()?;
+            Ok(())
+        })),
+        Err(err) => Err(err),
     }
 }

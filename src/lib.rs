@@ -8,14 +8,16 @@ pub mod workarounds;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
-struct PackageVersion {
-    revision: u8,
-    build: u8,
-    minor: u8,
-    major: u8,
+pub struct PackageVersion {
+    pub revision: u8,
+    pub build: u8,
+    pub minor: u8,
+    pub major: u8,
 }
 
 impl PackageVersion {
+    pub fn new(major: u8, minor: u8, build: u8, revision: u8) -> Self { Self { revision, build, minor, major } }
+
     fn to_major_minor(&self) -> u32 {
         ((self.major as u32) << 8) | self.minor as u32
     }
@@ -32,13 +34,11 @@ extern "system" {
     fn MddBootstrapShutdown() -> windows::HRESULT;
 }
 
-// TODO: Let user pass in versioning criteria
-
 /// Locates a Project Reunion framework package compatible with the specified versioning criteria
 /// and loads it into the current process. If multiple packages meet the criteria the best
 /// candidate is selected.
-pub fn initialize() -> windows::Result<()> {
-    match initialize_without_dialog() {
+pub fn initialize(minimum_version: PackageVersion) -> windows::Result<()> {
+    match initialize_without_dialog(minimum_version) {
         Err(err) => {
             match unsafe {
                 MessageBoxW(
@@ -55,19 +55,19 @@ pub fn initialize() -> windows::Result<()> {
     }
 }
 
-pub fn initialize_without_dialog() -> windows::Result<()> {
-    let package_version = PackageVersion {
-        major: 0,
-        minor: 8,
-        revision: 0,
-        build: 0,
-    };
+pub fn initialize_without_dialog(minimum_version: PackageVersion) -> windows::Result<()> {
     let version_tag: Vec<u16> = "preview".encode_utf16().collect();
     unsafe {
+        // We use the provided version info in both the requested and minimum
+        // version parameters to effectively request an exact match. This is
+        // to work around what appears to be a bug in Mdd
+        //
+        // https://github.com/microsoft/ProjectReunion/issues/949
+
         MddBootstrapInitialize(
-            package_version.to_major_minor(),
+            minimum_version.to_major_minor(),
             version_tag.as_ptr(),
-            package_version,
+            minimum_version,
         )
         .ok()
     }
