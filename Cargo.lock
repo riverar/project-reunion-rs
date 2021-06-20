@@ -16,34 +16,20 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb58b6451e8c2a812ad979ed1d83378caa5e927eef2622017a45f251457c2c9d"
 
 [[package]]
-name = "example-simple-window"
+name = "examples-simple-window"
 version = "0.0.0"
 dependencies = [
- "examples-simple-window-bindings",
+ "bindings",
  "project-reunion-rs",
  "windows",
 ]
 
 [[package]]
-name = "example-skeleton"
+name = "examples-skeleton"
 version = "0.0.0"
 dependencies = [
- "examples-skeleton-bindings",
+ "bindings",
  "project-reunion-rs",
- "windows",
-]
-
-[[package]]
-name = "examples-simple-window-bindings"
-version = "0.0.0"
-dependencies = [
- "windows",
-]
-
-[[package]]
-name = "examples-skeleton-bindings"
-version = "0.0.0"
-dependencies = [
  "windows",
 ]
 

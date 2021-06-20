@@ -1,4 +1,10 @@
+use bindings::Windows::Win32::{
+    Foundation::HWND,
+    UI::WindowsAndMessaging::{MessageBoxW, MB_ICONERROR, MB_OK},
+};
+
 mod tests;
+pub mod workarounds;
 
 #[repr(C)]
 #[derive(Clone, Copy)]
@@ -32,6 +38,24 @@ extern "system" {
 /// and loads it into the current process. If multiple packages meet the criteria the best
 /// candidate is selected.
 pub fn initialize() -> windows::Result<()> {
+    match initialize_without_dialog() {
+        Err(err) => {
+            match unsafe {
+                MessageBoxW(
+                    HWND::default(),
+                    "To run this application, the Project Reunion runtime must be installed.\n\nhttps://aka.ms/projectreunion/0.8preview",
+                    "This application could not be started",
+                    MB_OK | MB_ICONERROR,
+                )
+            } {
+                _ => Err(err),
+            }
+        }
+        _ => Ok(()),
+    }
+}
+
+pub fn initialize_without_dialog() -> windows::Result<()> {
     let package_version = PackageVersion {
         major: 0,
         minor: 8,

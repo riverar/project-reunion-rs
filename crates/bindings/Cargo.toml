@@ -1,5 +1,5 @@
 [package]
-name = "examples-skeleton-bindings"
+name = "bindings"
 version = "0.0.0"
 edition = "2018"
 
@@ -8,4 +8,3 @@ windows = "0.11.0"
 
 [build-dependencies]
 windows = "0.11.0"
-

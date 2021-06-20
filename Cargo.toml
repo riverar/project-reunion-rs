@@ -4,10 +4,11 @@ version = "0.0.0"
 edition = "2018"
 
 [dependencies]
-bindings = { path = "./bindings" }
+bindings = { path = "crates/bindings" }
 windows = "0.11.0"
 
 [workspace]
 members = [
+    "crates/*",
     "examples/*",
 ]
