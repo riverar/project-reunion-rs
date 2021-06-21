@@ -72,7 +72,7 @@ pub fn resize_window(window: &Window, width: u32, height: u32) -> bool {
     let width = width * scale_factor;
     let height = height * scale_factor;
     unsafe {
-        return bool::from(SetWindowPos(
+        bool::from(SetWindowPos(
             handle,
             HWND(0),
             0, // x
@@ -80,7 +80,7 @@ pub fn resize_window(window: &Window, width: u32, height: u32) -> bool {
             width as i32,
             height as i32,
             SWP_NOMOVE,
-        ));
+        ))
     }
 }
 
